@@ -1,1 +1,1 @@
-# Outer-Approximation-Algorithm-with-R
+# An implementation of Outer Approximation Algorithm on R
