@@ -28,8 +28,7 @@ nlpr = function()
   ub = c(1,Inf,Inf,5)
   local_opts = list("algorithm" = "NLOPT_LD_MMA", "xtol_rel" = 1.0e-7)
   opts = list( "algorithm" = "NLOPT_LD_MMA", "xtol_rel" = 1.0e-7, "maxeval" = 10000,"local_opts" = local_opts)
-  res = nloptr(x0 = x0, eval_f = eval_f, lb = lb, ub = ub, 
-               eval_g_ineq = eval_g_ineq, eval_jac_g_ineq = eval_jac_g0, opts = opts)
+  res = nloptr(x0 = x0, eval_f = eval_f, lb = lb, ub = ub, eval_g_ineq = eval_g_ineq, eval_jac_g_ineq = eval_jac_g0, opts = opts)
   return(res$solution)
 }
 
@@ -54,12 +53,9 @@ master = function(crr, upper, lower)
   model = add_constraint(model, eta >= lower)
   for (i in 1:nrow(crr)) 
   {
-    model = add_constraint(model, (-crr[i,1]-crr[i,2]) + 
-                             f.grad[1,i]*(y[1]-crr[i,1]) + f.grad[2,i]*(y[2]-crr[i,2]) <= eta)
-    model = add_constraint(model, ((crr[i,1]-0.5)^2 + (crr[i,2]-0.5)^2) - 0.25 + 
-                             c.grad[1,i]*(y[1]-crr[i,1]) + c.grad[2,i]*(y[2]-crr[i,2]) <= 0)
+    model = add_constraint(model, (-crr[i,1]-crr[i,2]) + f.grad[1,i]*(y[1]-crr[i,1]) + f.grad[2,i]*(y[2]-crr[i,2]) <= eta)
+    model = add_constraint(model, ((crr[i,1]-0.5)^2 + (crr[i,2]-0.5)^2) - 0.25 + c.grad[1,i]*(y[1]-crr[i,1]) + c.grad[2,i]*(y[2]-crr[i,2]) <= 0)
   }
-  
   
   results = solve_model(model, with_ROI("cplex", verbose = TRUE))
   if (solver_status(results) == 'infeasible') {return(c('infeasible'))}
@@ -69,7 +65,6 @@ master = function(crr, upper, lower)
 nlp = function(x.int) 
 {
   eval_f = function(x) {return(list("objective" = -x.int[1] - x[1] - x[2] - x.int[2], "gradient" = c(-1,-1)))}
-  
   eval_g_ineq = function(x) 
   {
     return(rbind(c((x[1]-0.5)^2 + (x[2] - 0.5)^2 - 0.25),
@@ -88,8 +83,6 @@ nlp = function(x.int)
   #if ()
   return(res$solution) 
 }
-
-
 nlpf = function(x.int) 
 {
   eval_f = function(x) {return(list("objective" = (x[1]-0.5)^2 + (x[2] - 0.5)^2 - 0.25,
@@ -133,33 +126,3 @@ while (zu[length(zu)] - zl[length(zl)] > 1.0e-3)
 }
 print(paste(c('The optimal solution is',current.solution), collapse=" "))
 print(paste(c("The optimal objective function is",zu[length(zu)-1]), collapse = " "))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
